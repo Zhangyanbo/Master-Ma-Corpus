@@ -55,6 +55,6 @@ if __name__ == '__main__':
     for file_path in files:
         parsed = parse_file(file_path)
         # save to csv use Pandas
-        df = pd.DataFrame(parsed, columns=['time', 'content', 'comments'])
+        df = pd.DataFrame(parsed, columns=['time', 'content', 'source'])
         file_name = os.path.basename(file_path).split('.')[0]
         df.to_csv('./data/{}.csv'.format(file_name), index=False)
