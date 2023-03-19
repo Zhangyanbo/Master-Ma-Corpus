@@ -23,4 +23,4 @@ def concat_csv(path):
 
 if __name__ == '__main__':
     merged = concat_csv('./data/')
-    merged.to_csv('./data/merged.csv', index=False)
+    merged.to_csv('merged.csv', index=False)
