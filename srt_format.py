@@ -10,6 +10,14 @@ def time_to_seconds(time_str):
     td = timedelta(hours=dt.hour, minutes=dt.minute, seconds=dt.second)
     return int(td.total_seconds())
 
+def parse_time_milliseconds(time_str):
+    '''Parses a time string in the format of HH:MM:SS,microsecond and returns the total number of microseconds.'''
+    parts = time_str.split(',')
+    time = datetime.strptime(parts[0], '%H:%M:%S')
+    microseconds = int(parts[1])
+    total_microseconds = (time.hour * 3600 + time.minute * 60 + time.second) * 1_000 + microseconds
+    return total_microseconds / 1_000.
+
 def preprocess_srt(srt_string):
     '''Removes whitespace and multiple newlines from a string.'''
     srt_string = srt_string.replace(' ', '').replace('\n\n', '\n')
@@ -24,9 +32,10 @@ def split_srt(srt_string):
 def parse_line(line):
     '''Parses a single subtitle entry and extracts the start time and content.'''
     parts = line.split('\n')
-    start_time = parts[0].split('-->')[0].split(',')[0]
+    start_time = parts[0].split('-->')[0]#.split(',')[0]
+    end_time = parts[0].split('-->')[1]#.split(',')[0]
     content = parts[1]
-    return [time_to_seconds(start_time), content]
+    return [parse_time_milliseconds(start_time), parse_time_milliseconds(end_time), content]
 
 def parse_string(srt_string, comments=''):
     '''Parses a preprocessed .srt string, extracting the start time, content, and comments for each subtitle entry.'''
@@ -55,6 +64,6 @@ if __name__ == '__main__':
     for file_path in files:
         parsed = parse_file(file_path)
         # save to csv use Pandas
-        df = pd.DataFrame(parsed, columns=['time', 'content', 'source'])
+        df = pd.DataFrame(parsed, columns=['start_time', 'end_time', 'content', 'source'])
         file_name = os.path.basename(file_path).split('.')[0]
         df.to_csv('./data/{}.csv'.format(file_name), index=False)
